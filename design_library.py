@@ -14,7 +14,7 @@ PAM_LENGTH = len(PAM_LIST[0])
 CLEAVAGE_SITE = 17 #distance to 5' end of guide
 
 #seqmap parameters
-N_PROBES = 10000
+N_PROBES = 50000
 MAX_PROCESSES = 1
 MAX_MISMATCHES = 3
 tf_counter = 0
@@ -230,7 +230,10 @@ def find_offtargets(input_prefix):
 
 	#merge output and clean up
 	for tf in tempfiles_in:
-		os.remove(tf.name)
+		try:
+			os.remove(tf.name)
+		except:
+			continue
 	with open(offtargets_file, "w") as offtargets_file_pointer:
 		for tf in tempfiles_out:
 			with open(tf.name) as f_out:
@@ -365,7 +368,10 @@ def get_sorted_guides(region, gene, GC_cutoff, spacing, input_prefix):
 		all_t_guides.append([gene["name"], t_guides[i][0], "t", gene["chrom"], loc])
 	all_guides = all_b_guides + all_t_guides #makes one nested list of bottom and top guides
 	all_guides_sorted = sorted(all_guides, key=itemgetter(-1))  #sorts by location
-	all_guides_filtered = remove_overlap(all_guides_sorted, spacing)
+	if len(all_guides_sorted) > 0:
+		all_guides_filtered = remove_overlap(all_guides_sorted, spacing)
+	else:
+		return []
 
 	return all_guides_filtered
 
@@ -422,6 +428,8 @@ def list_sgrnas(genes_file, input_prefix, GC_cutoff, spacing, guides_per_gene, g
 
 			#identify and filter guides that target region
 			guides = get_sorted_guides(region, gene, GC_cutoff, spacing, input_prefix)
+			if len(guides) == 0:
+				continue
 
 			#add offtarget scores to filtered guides and select guides with higher offtarget scores
 			ot_guides_sql = get_ot_guides(guides, input_prefix) 
@@ -491,4 +499,3 @@ def __main__():
 
 if __name__ == "__main__":
 	__main__()
-
