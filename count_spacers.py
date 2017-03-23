@@ -1,3 +1,5 @@
+#Supplementary Data 3: count_spacers.py
+
 from Bio import SeqIO
 import csv
 from collections import OrderedDict
