@@ -1,3 +1,5 @@
+# Supplementary Data 4: calculate_indel.py
+
 import difflib
 import numpy as np
 from scipy.stats import binom
@@ -81,7 +83,7 @@ def write_mle(sample_sheet, output_file, verbose, quiet):
     background = sum(background_list) / len(background_list)
 
     with open(output_file, 'w') as out_handle:
-        out_handle.write(output_header)
+        out_handle.write(output_header+'\n')
         for i, l in enumerate(output_text):
             if i in controls:
                 out_handle.write('{},{},{},{}\n'.format(l, 'NA', 'NA', 'NA'))
@@ -234,7 +236,7 @@ def file_calc(f_name, guide_loc, target, file_type, hash_flag):
     '''
     error_flag = True
     window_size = INITIAL_SEARCH_WINDOW
-    min_error = 1
+    min_error = 100
     min_total = []
     note = ''
 
@@ -246,10 +248,10 @@ def file_calc(f_name, guide_loc, target, file_type, hash_flag):
     while error_flag:  # attempt windows while above threshold
         target_window = target[guide_loc[0] -
                                window_size:guide_loc[1] + window_size]
-
         with open(f_name, 'rU') as f_handle:
             total_list = algorithm(
                 SeqIO.parse(f_handle, file_type), target_window)
+
         err_total = total_list[2]
         rejected_total = total_list[3]
         error_percentage = float(err_total) / \
@@ -264,7 +266,7 @@ def file_calc(f_name, guide_loc, target, file_type, hash_flag):
         window_size += SEARCH_INCREMENT
 
     if error_percentage > ERROR_TOLERANCE_THRESHOLD:
-        note = 'Error threshold not met, returning best attempt'
+        note = 'Error threshold not met returning best attempt'
     return min_total, note
 
 
@@ -307,10 +309,9 @@ def whole_file_read(sample_sheet, file_type, output_file, hash_flag, mle, verbos
             total_list, note = prep_entry(
                 file_name, guide, target, file_type, hash_flag)
             indel_total = total_list[1]
-            rejected_total = total_list[3]
+            rejected_total = total_list[2] + total_list[3]
             indel_rate = float(indel_total) / \
                 (sum(total_list) - rejected_total)
-
             total_list_string = ','.join(str(s) for s in total_list)
             out_handle.write('{},{},{},{}\n'.format(
                 sample_name, total_list_string, indel_rate, note))
