@@ -76,9 +76,9 @@ def GC_content(GC_cutoff, guide):
 	N += guide.count("C")
 	percent = float(N)/len(guide)*100
 	if percent > GC_cutoff:
-		return 'true'
+		return True
 	else: 
-		return 'false'
+		return False
 
 def get_b_guides(region, GC_cutoff, index_list):
 	"""
