@@ -342,7 +342,7 @@ def single_entry_read(sample_sheet, file_type, input_name, hash_flag, verbose, q
                     total_list_string = ','.join(str(s) for s in total_list)
 
                     out_handle.write('{},{},{},{}\n'.format(
-                        sample, total_list_string, indel_rate, note))
+                        sample_name, total_list_string, indel_rate, note))
 
 
 def combine_files(sample_sheet, file_type, output_file, mle, verbose, quiet):
